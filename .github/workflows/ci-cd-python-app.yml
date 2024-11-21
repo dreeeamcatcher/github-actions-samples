@@ -6,8 +6,8 @@ name: CI/CD Workflow
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    paths:
+      - 'app/**'
 
 jobs:
   build:
@@ -81,9 +81,9 @@ jobs:
     needs: build
     
     env:
-      PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-      GKE_CLUSTER: autopilot-cluster-1    # TODO: update to cluster name
-      GKE_REGION: us-central1	   # TODO: update to cluster region
+      PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+      GKE_CLUSTER: democluster
+      GKE_REGION: europe-north1
 
     steps:
     - name: Check out code
@@ -98,7 +98,7 @@ jobs:
     - name: Authenticate to Google Cloud
       uses: 'google-github-actions/auth@v0'
       with:
-        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+        credentials_json: '${{ secrets.GCP_KEY_JSON }}'
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v0
@@ -143,11 +143,11 @@ jobs:
         kubectl apply -k k8s/ 
    
     # DO SOME CHECKS HERE BEFORE COMMIT
-    #- name: Deploy updated Kubernetes resources
-    #  run: |
-    #    kubectl apply -k k8s/
+    - name: Perform post-deployment checks
+      run: |
+        kubectl rollout status deployment/hello-gitops --namespace=${{ env.NEW_NAMESPACE }}
 
-    # REMOVE OLD DEPLOYMENT!!
+    # REMOVE OLD DEPLOYMENT
     - name: Remove old namespace
       run: |
         namespacePresentOld=`kubectl get ns | grep ${{ env.OLD_NAMESPACE }} | wc -l`
@@ -160,7 +160,7 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git commit -am "Bump docker tag"
+        git commit -am "Deploy to ${{ env.NEW_NAMESPACE }} with image tag $GITHUB_SHA""
         
     - name: Push changes
       uses: ad-m/github-push-action@master
