@@ -7,4 +7,4 @@ namespace: python-app-blue
 images:
 - name: hello-gitops
   newName: dreeeamcatcher/hello-gitops
-  newTag: $GITHUB_SHA
+  newTag: 66ed9699fcdba9de2daf3113192d7f6e4520c3c2
