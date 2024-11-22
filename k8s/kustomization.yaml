@@ -3,8 +3,8 @@ kind: Kustomization
 resources:
 - deployment.yaml
 - service.yaml
-namespace: python-app-green
+namespace: argocd
 images:
 - name: hello-gitops
   newName: dreeeamcatcher/hello-gitops
-  newTag: 8547122ac2ddfb03489ed0b7a4a917b3089d206b
+  newTag: 20aecb2f5ba1b5c1de29f31342a8a0666bd34f03
