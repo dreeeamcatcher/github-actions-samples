@@ -3,8 +3,8 @@ kind: Kustomization
 resources:
 - deployment.yaml
 - service.yaml
-namespace: python-app-blue
+namespace: python-app-green
 images:
 - name: hello-gitops
   newName: dreeeamcatcher/hello-gitops
-  newTag: 66ed9699fcdba9de2daf3113192d7f6e4520c3c2
+  newTag: 8547122ac2ddfb03489ed0b7a4a917b3089d206b
