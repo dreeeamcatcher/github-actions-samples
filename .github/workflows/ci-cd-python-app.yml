@@ -94,7 +94,6 @@ jobs:
       with:
         kustomize-version: "3.6.1"
 
-    # Alternative option - authentication via credentials json
     - name: Authenticate to Google Cloud
       uses: 'google-github-actions/auth@v2'
       with:
@@ -145,12 +144,10 @@ jobs:
       run: |
         kubectl apply -k k8s/ 
    
-    # DO SOME CHECKS HERE BEFORE COMMIT
     - name: Perform post-deployment checks
       run: |
         kubectl rollout status deployment/hello-gitops --namespace=${{ env.NEW_NAMESPACE }}
 
-    # REMOVE OLD DEPLOYMENT
     - name: Remove old namespace
       run: |
         namespacePresentOld=`kubectl get ns | grep ${{ env.OLD_NAMESPACE }} | wc -l`
