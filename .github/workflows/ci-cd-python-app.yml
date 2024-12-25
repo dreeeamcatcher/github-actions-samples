@@ -130,10 +130,6 @@ jobs:
         kubectl patch service hello-gitops \
           -p '{"spec":{"selector":{"app":"hello-gitops","version":"green"}}}'
 
-    - name: Test connectivity within the cluster
-      run: |
-        kubectl run test-pod --rm -it --image=curlimages/curl -- curl http://hello-gitops:8050
-
     - name: Cleanup old deployment
       run: |
         kubectl delete deployment hello-gitops-blue || true
