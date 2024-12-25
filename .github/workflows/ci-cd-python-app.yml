@@ -109,29 +109,6 @@ jobs:
       run: |
         gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GKE_REGION"
 
-    - name: Create namespace & set in Kustomize
-      run: |
-         namespacePresentBlue=`kubectl get ns | grep python-app-blue | wc -l`
-         namespacePresentGreen=`kubectl get ns | grep python-app-green | wc -l`
-         if [ $namespacePresentBlue -eq 0 ]
-         then
-            kubectl create ns python-app-blue
-            cd k8s
-            kustomize edit set namespace python-app-blue
-            echo "NEW_NAMESPACE=python-app-blue" >> $GITHUB_ENV
-            echo "OLD_NAMESPACE=python-app-green" >> $GITHUB_ENV
-         elif [ $namespacePresentGreen -eq 0 ]
-         then
-            kubectl create ns python-app-green
-            cd k8s
-            kustomize edit set namespace python-app-green
-            echo "NEW_NAMESPACE=python-app-green" >> $GITHUB_ENV
-            echo "OLD_NAMESPACE=python-app-blue" >> $GITHUB_ENV
-         else
-            echo "Both Blue and Green namespaces are present! Exiting"
-            exit 1
-         fi
-
     - name: Update Kubernetes resources
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -146,21 +123,22 @@ jobs:
    
     - name: Perform post-deployment checks
       run: |
-        kubectl rollout status deployment/hello-gitops --namespace=${{ env.NEW_NAMESPACE }}
-
-    - name: Remove old namespace
+        kubectl rollout status deployment/hello-gitops 
+    
+    - name: Patch service to switch traffic to new version
       run: |
-        namespacePresentOld=`kubectl get ns | grep ${{ env.OLD_NAMESPACE }} | wc -l`
-        if [ $namespacePresentOld -eq 1 ]
-        then
-          kubectl delete ns ${{ env.OLD_NAMESPACE }} --wait=true
-        fi
+        kubectl patch service hello-gitops-service \
+          -p '{"spec":{"selector":{"app":"hello-gitops","version":"green"}}}'
+
+    - name: Cleanup old deployment
+      run: |
+        kubectl delete deployment hello-gitops-blue || true
  
     - name: Commit files
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git commit -am "Deploy to ${{ env.NEW_NAMESPACE }} with image tag $GITHUB_SHA"
+        git commit -am "Deploy to green with image tag $GITHUB_SHA"
         
     - name: Push changes
       uses: ad-m/github-push-action@master
