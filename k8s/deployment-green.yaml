@@ -32,8 +32,8 @@ spec:
               containerPort: 8050
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: 8080
             initialDelaySeconds: 15
-            periodSeconds: 10
+            periodSeconds: 15
               
