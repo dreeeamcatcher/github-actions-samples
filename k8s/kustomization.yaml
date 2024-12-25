@@ -6,4 +6,4 @@ resources:
 images:
 - name: hello-gitops
   newName: dreeeamcatcher/hello-gitops
-  newTag: 24ca4e2b4eeaeb21600dd3a061b11c638389c154
+  newTag: db3d9ee1d030551476ab7f3714549a4fd96eb5a2
