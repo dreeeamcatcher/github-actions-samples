@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: hello-gitops
+    version: green
+  name: hello-gitops-green
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-gitops
+      version: green
+  template:
+    metadata:
+      labels:
+        app: hello-gitops
+        version: green
+    spec:
+      containers:
+        - name: hello-gitops
+          image: dreeeamcatcher/hello-gitops:green
+          ports:
+            - name: http
+              containerPort: 8050
+              
