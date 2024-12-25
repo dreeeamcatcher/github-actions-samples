@@ -20,6 +20,7 @@ spec:
       containers:
         - name: hello-gitops
           image: dreeeamcatcher/hello-gitops:blue
+          imagePullPolicy: Always
           resources:
             requests:
               cpu: 100m
@@ -33,7 +34,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /health
-              port: 8080
+              port: 8050
             initialDelaySeconds: 15
             periodSeconds: 15
               
