@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
 - deployment.yaml
 - service.yaml
-namespace: argocd
 images:
 - name: hello-gitops
   newName: dreeeamcatcher/hello-gitops
